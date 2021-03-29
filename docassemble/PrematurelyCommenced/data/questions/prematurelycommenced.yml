@@ -1,0 +1,384 @@
+include:
+  - docassemble.AssemblyLine:al_package.yml
+  - docassemble.MassAccess:massaccess.yml
+---
+comment: |
+  The metadata section controls the tab title and saved interview title. You can delete this section if you include this YAML file in another YAML file.
+metadata:
+  title: |
+    Ask the court for a Motion to Dismiss - Case Prematurely Commenced: Mass Access Project
+  short title: |
+    Prematurely commenced
+  tags:
+    - HO-00-00-00-00
+---
+comment: |
+  This section is used by AssemblyLine to control how some of the questions work.
+mandatory: True
+code: |
+  interview_metadata # make sure we initialize the object
+  if not defined("interview_metadata['prematurely_commenced']"):
+    interview_metadata.initializeObject('prematurely_commenced')
+  interview_metadata['prematurely_commenced'].update({
+    'title': 'Ask the court for a Motion to Dismiss - Case Prematurely Commenced: Mass Access Project',
+    'short title': 'Prematurely commenced',
+    'description': 'This form will help you create a Motion to Dismiss for a case that started prematurely. Use this form if your landlord is taking you to court to evict you, if you did not receive the Notice To Quit or Notice to Terminate Your Tenancy or 30 or 14 day notice. If you were served papers that start the eviction process without proper notice and process, you may qualify for a Motion to Dismiss on the basis that the case was started without following the proper eviction guidelines.',
+    'original_form': '',
+    'allowed courts': [
+      'Boston Municipal Court',
+      'District Court',
+      'Housing Court',
+      'Superior Court',
+    ],
+    'categories': [
+      'HO-00-00-00-00',
+    ],
+    'logic block variable': 'prematurely_commenced',
+    'attachment block variable': 'prematurely_commenced_attachment',
+    'typical role': 'defendant',
+  })
+---
+code: |
+  interview_short_title = 'Ask the court to dismiss  your eviction case because it was prematurely commenced'
+---
+code: |
+  al_form_type = 'existing_case'
+---
+features:
+  navigation: True
+---
+sections:
+  - review_prematurely_commenced: Review your answers
+---
+objects:
+  - users: ALPeopleList.using(there_are_any=True)
+  - other_parties: ALPeopleList.using(there_are_any=True)
+---
+###################### Main order ######################
+mandatory: True
+comment: |
+  This block includes the logic for standalone interviews.
+  Delete mandatory: True to include in another interview
+id: main_order_prematurely_commenced
+code: |
+  al_intro_screen
+  prematurely_commenced_intro
+  # Interview order block has form-specific logic controlling order/branching
+  interview_order_prematurely_commenced
+  signature_date
+  # Save (anonymized) interview statistics.
+  store_variables_snapshot(data={'zip': users[0].address.zip})
+  prematurely_commenced_preview_question  # Pre-canned preview screen
+  basic_questions_signature_flow
+  prematurely_commenced_download
+---
+sets:
+  - other_parties[i].name.first
+id: names of opposing parties
+question: |
+  What is the name of your landlord?
+fields:
+  - code: |
+      other_parties[i].name_fields(person_or_business='unsure')
+---
+#################### Interview order #####################
+comment: |
+  Controls order and branching logic of questions in the interview
+id: interview_order_prematurely_commenced
+code: |
+  # Set the allowed courts for this interview
+  allowed_courts = interview_metadata["prematurely_commenced"]["allowed courts"]
+  nav.set_section('review_prematurely_commenced')
+  user_role = 'defendant'
+  user_ask_role = 'defendant'
+  docket_number
+  dont_know_docket_number
+  set_progress(16.67)
+  users.gather()
+  defendants = users
+  plaintiffs = other_parties
+  set_parts(subtitle=str(users))
+  users[0].address.address
+  set_progress(33.33)
+  plaintiffs.gather()
+  users[0].phone_number
+  trial_court
+  set_progress(50.0)
+  defendants.gather()
+  users[0].email
+  interview_order_prematurely_commenced = True
+---
+comment: |
+  This question is used to introduce your interview. Please customize
+id: Motion to Dismiss - Case Prematurely Commenced
+continue button field: prematurely_commenced_intro
+question: |
+  Motion to Dismiss - Case Prematurely Commenced
+subquestion: |
+  This form will help you create a Motion to Dismiss for a case that started prematurely. **Use this form if your landlord is taking you to court to evict you and if you did not receive the Notice To Quit or Notice to Terminate Your Tenancy or 30 or 14 day notice.** If you were served papers that start the eviction process without proper notice and process, you may qualify for a Motion to Dismiss on the basis that the case was started without following the proper eviction guidelines.
+---
+id: Review your form before you sign it
+continue button field: prematurely_commenced_preview_question
+question: |
+  Review your form before you sign it
+subquestion: |
+  Here is a preview of the form you will sign on the next page. 
+  
+   ${ al_user_bundle.as_pdf(key='preview') }
+  
+  Click the image to open it in a new tab. Click the 'Make changes' button to fix any mistakes.
+  
+  ${ action_button_html(url_action('review_prematurely_commenced'), label='Make changes', color='info') } 
+  
+  Remember to come back to this window to continue and sign your form.
+---
+id: Screen one id Motion to Dismiss Case Prematurely Commenced Package docassemble playground82PrematurelyCommenced playground MAVC 1 0 20 Motion to Dismiss Case Prematurely Commenced
+question: |
+  Screen one id: Motion to Dismiss - Case Prematurely Commenced Package: docassemble.playground82PrematurelyCommenced playground; MAVC-1.0.20  Motion to Dismiss - Case Prematurely Commenced
+subquestion: |
+  This form will help you create a Motion to Dismiss for a case that started prematurely. Use this form if your landlord is taking you to court to evict you, if you did not receive the Notice To Quit or Notice to Terminate Your Tenancy or 30 or 14 day notice. If you were served papers that start the eviction process without proper notice and process, you may qualify for a Motion to Dismiss on the basis that the case was started without following the proper eviction guidelines.
+fields:
+  - 'User': user
+---
+id: What is your contact information
+question: |
+  What is your contact information?
+subquestion: |
+  The court needs to be able to reach you to schedule your hearing.
+  
+  Include at least one way to reach you other than by mail.
+fields:
+  - 'Users[0].other contact method': users[0].other_contact_method
+    input type: area
+---
+id: any other users
+question: |
+  % if al_form_type in ['starts_case','existing_case','appeal']:
+  Is there another tenant living with you who will also sign this form?
+  % else:
+  Is anyone else adding their name to this form with you?
+  % endif
+subquestion: |
+  % if len(users.elements) > 1:  
+  So far you have told us about ${comma_and_list(users.complete_elements())}.
+  % endif  
+yesno: users.there_is_another 
+---
+sets:
+  - users[i].name.first
+  - users[i].name.last
+id: other users names
+question: |
+  % if al_form_type in ['starts_case','existing_case','appeal']:
+  What is the name of the ${ ordinal(i) } tenant who will also sign their name on this form with you?
+  % else:
+  What is the name of the ${ ordinal(i) } tenant who will also sign their name on
+  this form with you?
+  % endif
+fields:
+  - code: |
+      users[i].name_fields()
+---
+sets:
+  - users[i].address.address
+  - users[i].address.city
+  - users[i].address.zip
+id: persons address
+generic object: ALIndividual
+question: |
+  What is ${ users[i].possessive('address') }?
+fields:
+  - The same as ${ users[0]}'s address: users[i].address
+    datatype: object_radio
+    choices:
+      - users[0].address
+    disable others: True
+    none of the above: True
+  - code: |
+      users[i].address_fields(default_state="MA")  
+---
+code: |
+  addresses_to_search = [users[0].address]
+---
+id: Docket Number
+question: |
+  What is your docket number?
+fields:
+  - Docket number: docket_number
+    hide if: dont_know_docket_number
+  - I do not know: dont_know_docket_number
+    datatype: yesno
+validation code: |
+  if dont_know_docket_number: docket_number = ' '
+---
+sets:
+  - other_parties[0].name.first
+id: names of opposing parties
+question: |
+  What is the name of your landlord or the plaintiff who filed the suit?
+subquestion:  |
+  Write the landlord or plaintiff's name exactly the same way as it is
+  written on your court paperwork.
+  See Example Below. 
+  [FILE landlord_name.jpg, 100%]
+fields:
+  - code: |
+      other_parties[0].name_fields(person_or_business='unsure')
+---
+id: any other opposing parties
+question: |
+  % if users==plaintiffs:
+  Is there any other **defendant** or respondent in this
+  matter?
+  % else:
+  Is there any other **landlord** or plaintiff named in this matter?
+  % endif
+yesno: other_parties.there_is_another  
+---
+sets:
+  - other_parties[i].name.first
+id: names of opposing parties
+question: |
+  What is the name of your other landlord?
+subquestion:  |
+  Write your other landlord's name exactly the same way as it is
+  written on your court paperwork.
+  See Example Below. 
+  [FILE landlord_name.jpg, 100%]
+fields:
+  - code: |
+      other_parties[i].name_fields(person_or_business='unsure')
+---
+id: Take out your Notice to Quit and Summons and Complaint
+question: |
+  Take out your Notice to Quit and Summons and Complaint
+subquestion: |
+  Fill out the following questions with the dates from your Notice to Quit and your Summons and Complaint.
+fields:
+  - 'Date of termination': termination_date
+    datatype: date
+  - 'Date of commenced': commenced_date
+    datatype: date
+  - 'Date of service': service_date
+    datatype: date
+---
+progress: 100
+id: download
+event: prematurely_commenced_download
+question: |
+  Your form is ready to download.
+subquestion: |
+  Thank you ${users}. Your form is ready to download and deliver.
+  
+  View, download and send your form below. Click the "Make changes" button to fix any mistakes. 
+  
+  ${ action_button_html(url_action('review_prematurely_commenced'), label='Make changes', color='info') } 
+  
+  ${ al_user_bundle.download_list_html() }
+  
+  ${ al_user_bundle.send_button_html() }
+---
+objects:
+  - prematurely_commenced_attachment: ALDocument.using(title="This form will help you create a Motion to Dismiss for a case that started prematurely. Use this form if your landlord is taking you to court to evict you, if you did not receive the Notice To Quit or Notice to Terminate Your Tenancy or 30 or 14 day notice. If you were served papers that start the eviction process without proper notice and process, you may qualify for a Motion to Dismiss on the basis that the case was started without following the proper eviction guidelines.", filename="prematurely_commenced", enabled=True, has_addendum=False)
+---
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[prematurely_commenced_attachment], filename="prematurely_commenced.pdf", title="All forms to download for your records")
+  - al_court_bundle: ALDocumentBundle.using(elements=[prematurely_commenced_attachment], filename="prematurely_commenced.pdf", title="All forms to download for your records")
+---
+attachment:
+    variable name: prematurely_commenced_attachment[i]
+    name: Prematurely commenced
+    filename: Prematurely-commenced
+    docx template file: prematurely_commenced.docx
+---
+id: prematurely_commenced review screen
+event: review_prematurely_commenced
+question: |
+  Review Screen
+subquestion: |
+  Edit your answers below
+review: 
+  - Edit: docket_number
+    button: |
+      **Docket number**:
+      ${ docket_number }
+  - Edit: termination_date
+    button: |
+      **Date of termination**:
+      ${ termination_date }
+  - Edit: users[0].other_contact_method
+    button: |
+      **Users[0].other contact method**:
+      > ${ single_paragraph(users[0].other_contact_method) }
+  - Edit: commenced_date
+    button: |
+      **Date of commenced**:
+      ${ commenced_date }
+  - Edit: user
+    button: |
+      **User**:
+      ${ user }
+  - Edit: service_date
+    button: |
+      **Date of service**:
+      ${ service_date }
+  - Edit: courts[0].name.first
+    button: |
+      **courts**
+
+      % for my_var in courts:
+        * ${ my_var }
+      % endfor
+    # NOTE: a question block with 'courts.revisit'
+    # lets the user edit all of the items at once
+  - Edit: users[0].name.first
+    button: |
+      **users**
+
+      % for my_var in users:
+        * ${ my_var }
+      % endfor
+    # NOTE: a question block with 'users.revisit'
+    # lets the user edit all of the items at once
+  - Edit: users[0].address.address
+    button: |
+      **users[0].address.address**:
+      ${ users[0].address.address }
+  - Edit: plaintiffs[0].name.first
+    button: |
+      **plaintiffs**
+
+      % for my_var in plaintiffs:
+        * ${ my_var }
+      % endfor
+    # NOTE: a question block with 'plaintiffs.revisit'
+    # lets the user edit all of the items at once
+  - Edit: users[0].phone_number
+    button: |
+      **users[0].phone_number**:
+      ${ users[0].phone_number }
+  - Edit: courts[0].address.county
+    button: |
+      **courts[0].address.county**:
+      ${ courts[0].address.county }
+  - Edit: signature_date
+    button: |
+      **signature_date**:
+      ${ signature_date }
+  - Edit: defendants[0].name.first
+    button: |
+      **defendants**
+
+      % for my_var in defendants:
+        * ${ my_var }
+      % endfor
+    # NOTE: a question block with 'defendants.revisit'
+    # lets the user edit all of the items at once
+  - Edit: users[0].email
+    button: |
+      **users[0].email**:
+      ${ users[0].email }
+  - Edit: user.signature
+    button: |
+      **user.signature**:
+      ${ user.signature }
