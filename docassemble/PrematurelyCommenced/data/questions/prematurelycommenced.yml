@@ -99,13 +99,15 @@ code: |
   plaintiffs = other_parties
   set_parts(subtitle=str(users))
   users[0].address.address
-  set_progress(33.33)
+  set_progress(50.33)
   plaintiffs.gather()
   users[0].phone_number
   trial_court
-  set_progress(50.0)
+  set_progress(90.0)
   defendants.gather()
   users[0].email
+  commenced_date
+  warning_understand 
   interview_order_prematurely_commenced = True
 ---
 comment: |
@@ -255,12 +257,21 @@ question: |
 subquestion: |
   Fill out the following questions with the dates from your Notice to Quit and your Summons and Complaint.
 fields:
-  - 'Date of termination': termination_date
+  - 'Date commenced': commenced_date
     datatype: date
-  - 'Date of commenced': commenced_date
+  - 'Date of termination': termination_date
     datatype: date
   - 'Date of service': service_date
     datatype: date
+---
+id: warning 
+question: |
+    Warning! 
+subquestion: |
+  This date calculator assumes that you know you already qualify for this motion based on the timing you received your notices.
+fields:
+  - I understand: warning_understand 
+    datatype: yesno
 ---
 progress: 100
 id: download
