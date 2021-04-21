@@ -22,7 +22,7 @@ code: |
   interview_metadata['prematurely_commenced'].update({
     'title': 'Ask the court for a Motion to Dismiss - Case Prematurely Commenced: Mass Access Project',
     'short title': 'Prematurely commenced',
-    'description': 'This form will help you create a Motion to Dismiss for a case that started prematurely. Use this form if your landlord is taking you to court to evict you, if you did not receive the Notice To Quit or Notice to Terminate Your Tenancy or 30 or 14 day notice. If you were served papers that start the eviction process without proper notice and process, you may qualify for a Motion to Dismiss on the basis that the case was started without following the proper eviction guidelines.',
+    'description': 'This form will help you create a Motion to Dismiss for a case that  started prematurely. If you were served papers that start the eviction process without proper notice and process, you may qualify for a Motion to Dismiss on the basis that the case was started without following the proper eviction guidelines.',
     'original_form': '',
     'allowed courts': [
       'Boston Municipal Court',
@@ -117,7 +117,14 @@ continue button field: prematurely_commenced_intro
 question: |
   Motion to Dismiss - Case Prematurely Commenced
 subquestion: |
-  This form will help you create a Motion to Dismiss for a case that started prematurely. **Use this form if your landlord is taking you to court to evict you and if you did not receive the Notice To Quit or Notice to Terminate Your Tenancy or 30 or 14 day notice.** If you were served papers that start the eviction process without proper notice and process, you may qualify for a Motion to Dismiss on the basis that the case was started without following the proper eviction guidelines.
+  This form will help you create a Motion to Dismiss for a case that started prematurely. Use this form if your landlord is taking you to court to evict you and one of the folowing is true:
+  
+  * You did not receive the Notice to Quit. 
+  * You did not receive a Notice to Terminate Your Tenancy. 
+  * You did not receive 30 day notice. 
+  * You did not receive 14 days notice.
+
+  If you were served papers that start the eviction process without proper notice and process, you may qualify for a Motion to Dismiss on the basis that the case was started without following the proper eviction guidelines.
 ---
 id: Review your form before you sign it
 continue button field: prematurely_commenced_preview_question
@@ -266,11 +273,11 @@ fields:
 ---
 id: warning 
 question: |
-    Warning! 
+    Notice! 
 subquestion: |
-  This date calculator assumes that you know you already qualify for this motion based on the timing you received your notices.
+  Although we just took your dates, this interview does not have the ability to calculate whether you qualify for this motion based on the dates you entered. Visit [MA General Law 186 Section 14](https://malegislature.gov/laws/generallaws/partii/titlei/chapter186/section14) to learn more about whether the notice that you received from your landlord was sufficient or not.  
 fields:
-  - I understand: warning_understand 
+  - I understand.: warning_understand 
     datatype: yesno
 ---
 progress: 100
